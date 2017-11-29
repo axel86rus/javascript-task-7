@@ -16,7 +16,7 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
         let indexOfJob = 0;
         let queue = jobs.slice(0, parallelNum);
         let jobsIsWait = jobs.slice(parallelNum);
-        queue.map(job => start(job, indexOfJob++));
+        queue.forEach(job => start(job, indexOfJob++));
 
         function getTranslate(job) {
             return new Promise((resolveObj, rejectObj) => {

@@ -34,13 +34,11 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
         function finish(result, index) {
             results[index] = result;
 
-            if (indexJob === jobs.length) {
+            if (results.length === jobs.length) {
                 resolve(results);
-
-                return;
+            } else {
+                start(jobs[indexJob], indexJob++);
             }
-            
-            start(jobs[indexJob], indexJob++);
         }
     });
 }

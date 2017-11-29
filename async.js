@@ -18,17 +18,13 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
         let jobsIsWait = jobs.slice(parallelNum);
         queue.forEach(job => start(job, indexOfJob++));
 
-        function getTranslate(job) {
-            return new Promise((resolveObj, rejectObj) => {
-                job().then(resolveObj, rejectObj);
-                setTimeout(rejectObj, timeout, new Error('Promise timeout'));
-            });
-        }
-
         function start(job, indexResult) {
             let finishResult = result => finish(result, indexResult);
 
-            return getTranslate(job)
+            return new Promise((resolveObj, rejectObj) => {
+                job().then(resolveObj, rejectObj);
+                setTimeout(rejectObj, timeout, new Error('Promise timeout'));
+            })
                 .then(finishResult)
                 .catch(finishResult);
         }

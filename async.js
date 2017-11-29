@@ -34,7 +34,11 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
 
             if (!jobsIsWait.length) {
                 resolve(results);
-            } else if (indexOfJob < jobs.length) {
+
+                return;
+            }
+            
+            if (indexOfJob < jobs.length) {
                 start(jobsIsWait.shift(), indexOfJob++);
             }
         }

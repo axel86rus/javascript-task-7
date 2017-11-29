@@ -1,6 +1,3 @@
-// import { resolve } from "dns";
-// import { ftruncateSync } from "fs";
-
 'use strict';
 
 exports.isStar = true;
@@ -8,38 +5,39 @@ exports.runParallel = runParallel;
 
 function runParallel(jobs, parallelNum, timeout = 1000) {
     return new Promise(resolve => {
-        if (jobs === []) {
+        if (jobs.length === 0) {
             resolve([]);
         }
 
         let results = [];
-        let indexOfJob = 0;
-        let queue = jobs.slice(0, parallelNum);
-        let jobsIsWait = jobs.slice(parallelNum);
-        queue.forEach(job => start(job, indexOfJob++));
+        let indexJob = 0;
 
-        function start(job, indexResult) {
-            let finishResult = result => finish(result, indexResult);
+        jobs
+            .slice(0, parallelNum)
+            .forEach(task => {
+                start(task, indexJob++);
+            });
 
-            return new Promise((resolveObj, rejectObj) => {
-                job().then(resolveObj, rejectObj);
-                setTimeout(rejectObj, timeout, new Error('Promise timeout'));
-            })
-                .then(finishResult)
-                .catch(finishResult);
+        function getTranslate(task) {
+            return new Promise((resolveTask, rejectTask) => {
+                task().then(resolveTask, rejectTask);
+                setTimeout(rejectTask, timeout, new Error ('Promise timeout'));
+            });
         }
+        function start(task, index) {
+            let writeResult = result => finish(result, index);
 
-        function finish(result, indexResult) {
-            results[indexResult] = result;
+            return getTranslate(task)
+                .then(writeResult)
+                .catch(writeResult);
+        }
+        function finish(result, index) {
+            results[index] = result;
 
-            if (!jobsIsWait.length) {
+            if (indexJob === jobs.length) {
                 resolve(results);
-
-                return;
-            }
-            
-            if (indexOfJob < jobs.length) {
-                start(jobsIsWait.shift(), indexOfJob++);
+            } else {
+                start(jobs[indexJob], indexJob++);
             }
         }
     });

@@ -36,9 +36,11 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
 
             if (indexJob === jobs.length) {
                 resolve(results);
-            } else {
-                start(jobs[indexJob], indexJob++);
+
+                return;
             }
+            
+            start(jobs[indexJob], indexJob++);
         }
     });
 }
